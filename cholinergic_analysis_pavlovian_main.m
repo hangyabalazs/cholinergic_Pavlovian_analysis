@@ -155,33 +155,23 @@ if behav_analysis
     Ach_lick_psth_summary(achcells,resdir_lick_psth,true)  % average lick PSTH
     Ach_lick_poppsth(achcells,resdir_lick_psth,true) % color-coded lick raster
     
-    % Behavioral statistics - Wilcoxon signed rank test
-    %     resdir_astat = fullfile(resdir,'Fig1','anticipatory_stat');
-    %     T18 = anticipatory_stat('HDB18',resdir_astat);
-    %     T25 = anticipatory_stat('HDB25',resdir_astat);
-    %     T36 = anticipatory_stat('HDB36',resdir_astat);
-    %     T38 = anticipatory_stat('HDB38',resdir_astat);
-    %     T01 = anticipatory_stat('HW001',resdir_astat);
-    %     behavioral_data = [{T18} {T25} {T36} {T38} {T01}];
-    %     labels = {'HDB18' 'HDB25' 'HDB36' 'HDB38' 'HW001'};
-    %     lineplot_with_errorbars(behavioral_data, labels, resdir_astat); % plot results: line plot with error bars for each animal
-    
-    % average spike shape
+    % Average spike shape
     resdir_spikeshape = fullfile(resdir,'Fig1','spike_shape_analysis');   % results directory
     issave = true;
-    SpikeShape=spikeshapeanalysis_p(achcells,issave, resdir_spikeshape)
+    SpikeShape = spikeshapeanalysis_p(achcells,issave, resdir_spikeshape);
     
     avg_waveform = nan(length(achcells), 27);
     for a = 1:length(achcells)
-        avg_waveform(a,:)=SpikeShape{a}.Spike
+        avg_waveform(a,:) = SpikeShape{a}.Spike;
     end
-    %plot avg waveform
+    
+    % Plot avg waveform
     H = figure;
     errorshade([1:size(avg_waveform,2)],mean(avg_waveform),std(avg_waveform),...
         'LineColor',[0 0 1],'ShadeColor',[0 0 1])
     set(gcf, 'renderer', 'painters'); % set renderer
     
-    % save
+    % Save
     saveas(gcf, fullfile(resdir_spikeshape, ['avg_spikeshape.eps']));
     saveas(gcf, fullfile(resdir_spikeshape, ['avg_spikeshape.jpg']));
 end
