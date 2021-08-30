@@ -124,7 +124,7 @@ if tagging_stat
     close all
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%% NOT READY YET
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -272,7 +272,7 @@ omission_achcells = achcells(delstr2==1);
 
 % Example PSTHs
 if example_PSTH_plot
-    resdir_example=fullfile(resdir, 'Fig2', 'example');
+    resdir_example = fullfile(resdir, 'Fig2', 'example');
     if ~isfolder(resdir_example)
         mkdir(resdir_example);
     end
@@ -288,30 +288,15 @@ if example_PSTH_plot
         set(G, 'renderer', 'painters')
         saveas(G, fullfile(resdir_example, ['cue_example_' cellidt '.eps']))
         close(G)
-        %
-        %         H = figure
-        %         viewcell2b(e_cell,'TriggerName','DeliverAllFeedback','SortEvent','TrialStart','sigma', 0.07,'eventtype','behav','ShowEvents',{{'StimulusOn'}},'Partitions','#AllReward','window',[-3 3])
-        %         saveas(H, fullfile(resdir_example, ['reward_example_' cellidt '.jpg']))
-        %         set(H, 'renderer', 'painters')
-        %         saveas(H, fullfile(resdir_example, ['reward_example_' cellidt '.eps']))
-        %         close(H)
-        %
-        %
-        %         I = figure
-        %         viewcell2b(e_cell,'TriggerName','DeliverAllFeedback','SortEvent','TrialStart','sigma', 0.07,'eventtype','behav','ShowEvents',{{'StimulusOn'}},'Partitions','#Punishment','window',[-3 3])
-        %         saveas(I, fullfile(resdir_example, ['punish_example_' cellidt '.jpg']))
-        %         set(I, 'renderer', 'painters')
-        %         saveas(I, fullfile(resdir_example, ['punish_example_' cellidt '.eps']))
-        %         close(I)
-        J = figure
+        
+        J = figure;
         viewcell2b(e_cell,'TriggerName','StimulusOn','SortEvent','TrialStart','sigma', 0.2,'eventtype','behav','ShowEvents',{{'DeliverAllFeedback'}},'Partitions','#Omission','window',[-3 3])
         saveas(J, fullfile(resdir_example, ['omission_example_cuealigned_' cellidt '.jpg']))
         set(J, 'renderer', 'painters')
         saveas(J, fullfile(resdir_example, ['omission_example_cuealigned_' cellidt '.eps']))
         close(J)
         
-        %
-        J = figure
+        J = figure;
         viewcell2b(e_cell,'TriggerName','DeliverAllFeedback','SortEvent','TrialStart','sigma', 0.2,'eventtype','behav','ShowEvents',{{'StimulusOn'}},'Partitions','#Omission','window',[-3 3])
         saveas(J, fullfile(resdir_example, ['omission_example_' cellidt '.jpg']))
         set(J, 'renderer', 'painters')
@@ -335,7 +320,6 @@ if avg_PSTH_plot % average PSTH, boxplot for response magnitude and maxvalue
     avg_psth_cholinergic(selected_achcells, 'omission', 'none', fullfile(resdir, 'Fig2', PSTHdir1_selected, 'all_cholinergic'));
     avg_psth_cholinergic(omission_achcells, 'omission', 'none', fullfile(resdir, 'Fig2', PSTHdir1_selected, 'all_cholinergic'));
     
-    
     label = getvalue('RatID_Tag',achcells);  % FIG.SX
     resdir_g1 = fullfile(resdir,'Fig2','group_by_animal','TrialType1');
     psth_by_label(psth_R1,time,label,resdir_g1);
@@ -357,7 +341,7 @@ if avg_PSTH_plot % average PSTH, boxplot for response magnitude and maxvalue
     [psth_R1, psth_R2, time] = avg_psth_cholinergic(selected_achcells, 'reward', 'none', fullfile(resdir, 'Fig2', PSTHdir1, 'filtered_cholinergic'));
     avg_psth_cholinergic(selected_achcells, 'punish', 'none', fullfile(resdir, 'Fig2', PSTHdir1, 'filtered_cholinergic'));
     
-    %Quantify effect size
+    % Quantify effect size
     effect_size(selected_achcells, 'cue', 'none', fullfile(resdir, 'Fig2', PSTHdir1, 'filtered_cholinergic_effect_size'));
     effect_size(selected_achcells, 'reward', 'none', fullfile(resdir, 'Fig2', PSTHdir1, 'filtered_cholinergic_effect_size'));
     effect_size(selected_achcells, 'punish', 'none', fullfile(resdir, 'Fig2', PSTHdir1, 'filtered_cholinergic_effect_size'));
