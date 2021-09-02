@@ -1,6 +1,6 @@
 function ach_nonach_ccg(cellids,resdir,issave)
 %ACH_NONACH_CCG(CELLIDS, RESDIR, ISSAVE)   Cross-correlation analysis of cholinergic and noncholinergic neurons.
-%   ACH_CCG calculates cross-correlations for BF cholinergic neurons
+%   ACH_NONACH_CCG calculates cross-correlations for BF cholinergic neurons
 %   (listed in CELLIDS) and noncholinergic neurons recorded in the same
 %   session in 50 ms windows. CCG results are saved to RESDIR if ISSAVE is true.
 %

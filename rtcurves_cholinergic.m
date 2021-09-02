@@ -1,10 +1,10 @@
 function rtcurves_cholinergic(cellids,varargin)
 %RTCURVES_CHOLINERGIC   PSTHs of cholinergic neurons for different reaction times.
-%   RTCURVES(CELLIDS) calculates non-adaptive PSTHs and raster plots for
-%   a set of cells aligned to 'Go' and 'No-go' tone/response onset. The
-%   trials are partitioned based on reaction time quartiles. The PSTHs,
-%   rasters and population average PSTHs are plotted and saved. Input
-%   parameters:
+%   RTCURVES_CHOLINERGIC(CELLIDS, VARARGIN) calculates non-adaptive PSTHs 
+%   and raster plots for a set of cells aligned to 'Go' and 'No-go' 
+%   tone/response onset. The trials are partitioned based on reaction time 
+%   quartiles. The PSTHs, rasters and population average PSTHs are plotted 
+%   and saved. Input parameters:
 %       CELLIDS - index set to CELLIDLIST (see CellBase documentation)
 %
 %   Default behavior can be modified by using a set of paramter-value pairs

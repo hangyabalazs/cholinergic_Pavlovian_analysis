@@ -80,40 +80,40 @@ BR_C1 = C1(:,5);
 BR_C2 = C2(:,5);
 
 % Pool data across cells within mice
-% [cue_per_animal1,cue_per_animal2,reward_per_animal1, reward_per_animal2]  = deal(nan(1,NumAnimals)); % preallocate
-% for k = 1:NumAnimals % loop through animals
-%     inx = ~cellfun(@isempty, (strfind(cellids, animals{k}))); % indices of cells for the current animal
-%     
-%     r1 = vertcat(BR_R1{inx}); % concatenate reward responses
-%     r2 = vertcat(BR_R2{inx});
-%     
-%     c1 = vertcat(BR_C1{inx}); % concatenate cue responses
-%     c2 = vertcat(BR_C2{inx});
-% 
-%     [cue_per_cell1, cue_per_cell2, reward_per_cell1, reward_per_cell2] = deal([]);
-%     
-%     % get trial-by-trial cue and reward responses (baseline substracted)
-%     c1_ind = sum(c1(:,WNt_cue(1):WNt_cue(2)),2)/twin2(2)-sum(c1(:,WNb_cue(1):WNb_cue(2)),2)/abs(bwin2(2)-bwin2(1));
-%     c2_ind = sum(c2(:,WNt_cue(1):WNt_cue(2)),2)/twin2(2)-sum(c2(:,WNb_cue(1):WNb_cue(2)),2)/abs(bwin2(2)-bwin2(1));
-%     
-%     r1_ind = sum(r1(:,WNt_reward(1):WNt_reward(2)),2)/twin1(2)-sum(r1(:,WNb_reward(1):WNb_reward(2)),2)/abs(bwin1(2)-bwin1(1));
-%     r2_ind = sum(r2(:,WNt_reward(1):WNt_reward(2)),2)/twin1(2)-sum(r2(:,WNb_reward(1):WNb_reward(2)),2)/abs(bwin1(2)-bwin1(1));
-%     
-%     cue_per_animal1(k) = mean(c1_ind); % mean cue and reward responses for each animal
-%     cue_per_animal2(k) = mean(c2_ind);
-%     reward_per_animal1(k) = mean(r1_ind);
-%     reward_per_animal2(k) = mean(r2_ind);
-%     
-%     filename_animal1 = ['cue_reward_correlation1_' animals{k}];
-%     filename_animal2 = ['cue_reward_correlation2_' animals{k}];
-%     
-%     % trial-by-trial plot + linear regression for each animal
-%     regressionplot(c1_ind, r1_ind, 'Reward cue', 'Expected reward', filename_animal1, animals{k},  resdir)
-%     regressionplot(c2_ind, r2_ind, 'Punish cue', 'Surprising reward', filename_animal2, animals{k},  resdir)
-% end
+[cue_per_animal1,cue_per_animal2,reward_per_animal1, reward_per_animal2]  = deal(nan(1,NumAnimals)); % preallocate
+for k = 1:NumAnimals % loop through animals
+    inx = ~cellfun(@isempty, (strfind(cellids, animals{k}))); % indices of cells for the current animal
+    
+    r1 = vertcat(BR_R1{inx}); % concatenate reward responses
+    r2 = vertcat(BR_R2{inx});
+    
+    c1 = vertcat(BR_C1{inx}); % concatenate cue responses
+    c2 = vertcat(BR_C2{inx});
+    
+    [cue_per_cell1, cue_per_cell2, reward_per_cell1, reward_per_cell2] = deal([]);
+    
+    % Get trial-by-trial cue and reward responses (baseline substracted)
+    c1_ind = sum(c1(:,WNt_cue(1):WNt_cue(2)),2)/twin2(2)-sum(c1(:,WNb_cue(1):WNb_cue(2)),2)/abs(bwin2(2)-bwin2(1));
+    c2_ind = sum(c2(:,WNt_cue(1):WNt_cue(2)),2)/twin2(2)-sum(c2(:,WNb_cue(1):WNb_cue(2)),2)/abs(bwin2(2)-bwin2(1));
+    
+    r1_ind = sum(r1(:,WNt_reward(1):WNt_reward(2)),2)/twin1(2)-sum(r1(:,WNb_reward(1):WNb_reward(2)),2)/abs(bwin1(2)-bwin1(1));
+    r2_ind = sum(r2(:,WNt_reward(1):WNt_reward(2)),2)/twin1(2)-sum(r2(:,WNb_reward(1):WNb_reward(2)),2)/abs(bwin1(2)-bwin1(1));
+    
+    cue_per_animal1(k) = mean(c1_ind); % mean cue and reward responses for each animal
+    cue_per_animal2(k) = mean(c2_ind);
+    reward_per_animal1(k) = mean(r1_ind);
+    reward_per_animal2(k) = mean(r2_ind);
+    
+    filename_animal1 = ['cue_reward_correlation1_' animals{k}];
+    filename_animal2 = ['cue_reward_correlation2_' animals{k}];
+    
+    % Trial-by-trial plot + linear regression for each animal
+    regressionplot(c1_ind, r1_ind, 'Reward cue', 'Expected reward', filename_animal1, animals{k},  resdir)
+    regressionplot(c2_ind, r2_ind, 'Punish cue', 'Surprising reward', filename_animal2, animals{k},  resdir)
+end
 
-% regressionplot(cue_per_animal1', reward_per_animal1', 'Reward cue', 'Expected reward', 'cue_reward_correlation1', 'All animals', resdir) % all animals summarized
-% regressionplot(cue_per_animal2', reward_per_animal2', 'Punish cue', 'Surprising reward', 'cue_reward_correlation2', 'All animals', resdir)
+regressionplot(cue_per_animal1', reward_per_animal1', 'Reward cue', 'Expected reward', 'cue_reward_correlation1', 'All animals', resdir) % all animals summarized
+regressionplot(cue_per_animal2', reward_per_animal2', 'Punish cue', 'Surprising reward', 'cue_reward_correlation2', 'All animals', resdir)
 
 % Regression plot for each cell individually
 for c = 1:length(cellids)

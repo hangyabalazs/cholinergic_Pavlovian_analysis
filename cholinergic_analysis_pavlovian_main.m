@@ -169,11 +169,11 @@ if behav_analysis
     H = figure;
     errorshade([1:size(avg_waveform,2)],mean(avg_waveform),std(avg_waveform),...
         'LineColor',[0 0 1],'ShadeColor',[0 0 1])
-    set(gcf, 'renderer', 'painters'); % set renderer
+    set(H, 'renderer', 'painters'); % set renderer
     
     % Save
-    saveas(gcf, fullfile(resdir_spikeshape, ['avg_spikeshape.eps']));
-    saveas(gcf, fullfile(resdir_spikeshape, ['avg_spikeshape.jpg']));
+    saveas(H, fullfile(resdir_spikeshape, ['avg_spikeshape.eps']));
+    saveas(H, fullfile(resdir_spikeshape, ['avg_spikeshape.jpg']));
 end
 
 if opto_tagging
@@ -276,8 +276,8 @@ if example_PSTH_plot
     if ~isfolder(resdir_example)
         mkdir(resdir_example);
     end
-    %     example_cells = {'HDB36_190426a_3.1', 'HDB36_190504a_5.1', 'HDB36_190508a_3.2'};
-    example_cells = achcells;
+    example_cells = {'HDB36_190426a_3.1', 'HDB36_190504a_5.1', 'HDB36_190508a_3.2'};
+   
     for e=1:length(example_cells)
         e_cell = example_cells{e};
         cellidt = e_cell;
@@ -457,8 +457,8 @@ if fig3spec
     % Correlation of model parameters with behavioral discimination
     resdir_lrc_allcells = fullfile(resdir,'Fig3','modellickratecorr','all_cholinergic'); % results directory
     modellickratecorr(achcells,a11,a21,resdir_lrc_allcells);
-    %     resdir_lrc_hdbcells = fullfile(resdir,'Fig3','modellickratecorr','hdb'); % results directory
-    %     modellickratecorr(hdbcells,a12,a22,resdir_lrc_hdbcells);
+        resdir_lrc_hdbcells = fullfile(resdir,'Fig3','modellickratecorr','hdb'); % results directory
+        modellickratecorr(hdbcells,a12,a22,resdir_lrc_hdbcells);
     
     resdir_lrc_selected_achcells = fullfile(resdir,'Fig3','modellickratecorr','selected_achcells'); % results directory
     modellickratecorr(selected_achcells,a13,a23,resdir_lrc_selected_achcells);

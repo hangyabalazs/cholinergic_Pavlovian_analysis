@@ -1,4 +1,16 @@
 function effect_size(achcells, responsetype, ispart, resdir, data_type)
+%EFFECT_SIZE quantify effect size.
+%   
+%   EFFECT_SIZE(ACHCELLS, RESPONSETYPE, ISPART, RESDIR, DATA_TYPE)compare
+%   cue, reward and punishment (RESPONSETYPE) response size of ACHCELLS 
+%   under expected and unexpected conditions. If ISPART is true, trials are 
+%   partitioned by the defined variable and plotted separately. Results are
+%   saved to RESDIR.
+
+%   EFFECT_SIZE(ACHCELLS, RESPONSETYPE, ISPART, RESDIR, DATA_TYPE)
+%   calls ULTIMATE_PSTH for virtual (simulated) spikes if DATA_TYPE input
+%   argument is 'virtual'. This can be used to analyze simulated data the
+%   same way as real spiking.
 
 %   Panna Hegedus, Balazs Hangya
 %   Institute of Experimental Medicine
@@ -139,3 +151,6 @@ BR2 = R2(:,5); % binraster for cue2
 
 diff_all=(psth_R1_t./psth_R2_t)*100-100;
 diff_all2=(psth_R2_t./psth_R1_t)*100-100;
+
+% Save results
+save(fullfile(resdir, [responsetype '_effect_size.mat']), 'diff_all', 'diff_all2');
