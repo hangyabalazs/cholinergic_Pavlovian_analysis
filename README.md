@@ -25,8 +25,8 @@ Move the .m files on your MATLAB path. No further installation is needed.
 
 ## Dependencies
 
-This code relies on the CellBase data base system.
-MATLAB code for CellBase is available at www.github.com/hangyabalazs/CellBase.
+- This code relies on the CellBase data base system. MATLAB code for CellBase is available at www.github.com/hangyabalazs/CellBase.
+- Confidence intervals for regression are derived using the polypredci.m function (Star Strider, https://www.mathworks.com/matlabcentral/fileexchange/57630-polypredci, MATLAB Central File Exchange, retrieved December 30, 2020).
 
 ## System requirements  
 Windows 10 64bits  
