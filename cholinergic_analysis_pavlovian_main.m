@@ -35,7 +35,7 @@ function cholinergic_analysis_pavlovian_main(achcells, preproc, fig1spec, fig2sp
 %   29-Apr-2020
 
 % Input argument check
-narginchk(0,6)
+narginchk(0,7)
 if nargin < 1
     achcells = [];
 end
@@ -45,7 +45,7 @@ usr = getenv('username');
 if ismember(usr,{'hangya.balazs','hangyab','Hangya Balázs'})
     choosecb('Pavlovian_cholinergic')   % choose CellBase
 else
-    choosecb('Cholinergic_pavlovian')   % choose CellBase
+    choosecb('Ach_pavlovian')   % choose CellBase
 end
 
 % Control of different analysis domains
@@ -53,18 +53,24 @@ if nargin < 2
     preproc = [1 1 1];
 end
 if nargin < 3
-    fig1spec = [1 1 1];
+    fig1spec = 1;
 end
 if nargin < 4
     fig2spec = [1 1];
 end
 if nargin < 5
-    fig3spec = 1;
+    fig3spec = [1 1];
 end
 if nargin < 6
-    fig4spec = [1 1 1 1];
+    fig4spec = [1 1];
 end
 if nargin < 7
+    fig5spec = 1;
+end
+if nargin < 8
+    fig6spec = [1 1 1 1];
+end
+if nargin < 9
     extraspec = [0 0 0 0];
 end
 
@@ -73,18 +79,26 @@ perform_acg = preproc(1);   % ACG
 perform_ccg = preproc(2);   % CCG
 tagging_stat = preproc(3);   % TAGGING STATISTICS
 
-behav_analysis = fig1spec(1);
-opto_tagging = fig1spec(2);
-clustering = fig1spec(3);
+behav_analysis = fig1spec;
 
-example_PSTH_plot = fig2spec(1);
-avg_PSTH_plot = fig2spec(2);
+fiber_photometry_ex = fig2spec(1);
+fiber_photometry_avg = fig2spec(2);
 
-cue_rt = fig4spec(1);
-cue_lick_corr = fig4spec(2);
-islickPSTH = fig4spec(3);
-rt_lick_corr = fig4spec(4);
+opto_tagging = fig3spec(1);
+clustering = fig3spec(2);
 
+example_PSTH_plot = fig4spec(1);
+avg_PSTH_plot = fig4spec(2);
+
+modelspec = fig5spec;
+
+cue_rt = fig6spec(1);
+cue_lick_corr = fig6spec(2);
+islickPSTH = fig6spec(3);
+rt_lick_corr = fig6spec(4);
+
+figs1spec = extraspec(1);
+figs3spec = extraspec(2);
 psth_by_area = extraspec(1);
 ccg_pairs = extraspec(2);
 cue_reward_corr = extraspec(3);
@@ -97,7 +111,7 @@ location = getvalue('Area1', achcells);
 achcells = setdiff(achcells, achcells(strcmp(location, 'AcbC'))) % remove the cholinerg cell from accumbens
 
 % Results directory
-resdir = [getpref('cellbase','datapath') '\_paper_figs_2021MARCH\']; % directory for saving figures/analysis results
+resdir = [getpref('cellbase','datapath') '\_paper_figs_2022AUG\']; % directory for saving figures/analysis results
 if ~isfolder(resdir)
     mkdir(resdir)
 end
@@ -111,6 +125,7 @@ acg_resdir = fullfile(resdir,'acg');   % results directory
 if perform_acg
     ach_acg(achcells, acg_resdir,true);
 end
+
 
 % Calculate cross-correlograms
 ccg_resdir = fullfile(resdir,'ccg');   % results directory
@@ -130,7 +145,7 @@ end
 
 if behav_analysis
     
-    % Example lick raster and PETH - FIG1.D
+    % Example lick raster and PETH - FIG1.B,C
     resdir_lick_example = fullfile(resdir,'Fig1','lick_example');   % results directoryfigure;  % example lick PSTH + raster
     if ~isfolder(resdir_lick_example)
         mkdir(resdir_lick_example)
@@ -149,13 +164,81 @@ if behav_analysis
     
     close(H)
     
-    % Average lick PETH - FIG1.E-F
-    resdir_lick_psth = fullfile(resdir,'Fig1','lick_psth');   % results directory
-    Ach_lick_psth_summary_allcond(achcells,resdir_lick_psth,true)  % average lick PSTH
-    Ach_lick_psth_summary(achcells,resdir_lick_psth,true)  % average lick PSTH
-    Ach_lick_poppsth(achcells,resdir_lick_psth,true) % color-coded lick raster
+    % Average lick PETH or all animals - FIG1.D-E
+    resdir_lick_psth = fullfile(resdir,'Fig1','lick_psth_allanimals');   % results directory
+    cbname_allanimals = 'AllTones'; % choose location of data
+    reversal_learning(cbname_allanimals, resdir_lick_psth); % average lick PSTH and statistics
+    reversal_learning_allcond(cbname_allanimals, resdir_lick_psth) % average lick PSTH and statistics
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if fiber_photometry_ex % example session of fiber photometry imaging - Fig2. D
+    resdir_FF_example = fullfile(resdir,'Fig2','FF_example'); % Results directory
     
-    % Average spike shape
+    if ~isfolder(resdir_FF_example) % If results directory not exist, create
+        mkdir(resdir_FF_example)
+    end
+    
+    animalID = '134HDBACHGCAMP4'; % Animal and session ID for example fiber photometry recordings
+    sessionID = '220209';
+    
+    % Cue response
+    viewphotometry(animalID,sessionID,'TriggerEvent','StimulusOn','SortEvent','TrialStart','Partitions','#TrialType','Signal','dff_D');
+    
+    C = gcf;
+    maximize_figure(C);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_StimulusOn_Ch1.fig']);
+    saveas(C,fnm);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_StimulusOn_Ch1.png']);
+    saveas(C,fnm);
+    set(C, 'renderer', 'painters')
+    fnm = fullfile(resdir_FF_example,[animalID '_' sessionID '_StimulusOn_Ch1.eps']);
+    saveas(C,fnm);
+    close(C)
+    
+    % Reward response
+    viewphotometry(animalID,sessionID,'TriggerEvent','DeliverAllFeedback','SortEvent','TrialStart','Partitions','#Reward','Signal','dff_D');
+    R = gcf;
+    maximize_figure(R);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_AllReward_Ch1.fig']);
+    saveas(R,fnm);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_AllReward_Ch1.png']);
+    set(R, 'renderer', 'painters')
+    fnm = fullfile(resdir_FF_example,[animalID '_' sessionID '_AllReward_Ch1.eps']);
+    saveas(R,fnm);
+    close(R)
+    
+    % Punishment response
+    viewphotometry(animalID,sessionID,'TriggerEvent','DeliverAllFeedback','SortEvent','TrialStart','Partitions','#Punishment','Signal','dff_D');
+    P = cgf;
+    maximize_figure(P);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_Punishment_Ch1.fig']);
+    saveas(P,fnm);
+    fnm = fullfile(resdir_FF_example, [animalID '_' sessionID '_Punishment_Ch1.png']);
+    saveas(P,fnm);
+    set(P, 'renderer', 'painters')
+    fnm = fullfile(resdir_FF_example,[animalID '_' sessionID '_Punishment_Ch1.eps']);
+    saveas(P,fnm);
+end
+
+if fiber_photometry_avg % average PETH of all sessions
+    cellids=[ {{'134HDBACHGCAMP4' '220108' 'Ch1'}} {{'134HDBACHGCAMP4' '220109' 'Ch1'}} {{'134HDBACHGCAMP4' '220111' 'Ch1'}} {{'136HDBACHGCAMP6' '220111' 'Ch2'}} {{'136HDBACHGCAMP6' '220113' 'Ch2'}} {{'136HDBACHGCAMP6' '220114' 'Ch2'}} {{'HDBACHGCAMP8' '220224' 'Ch2'}} {{'HDBACHGCAMP10' '220226' 'Ch2'}} {{'HDBACHGCAMP13' '220405' 'Ch2'}} {{'HDBACHGCAMP13' '220406' 'Ch1'}} {{'HDBACHGCAMP13' '220407' 'Ch2'}} {{'HDBACHGCAMP13' '220408' 'Ch1'}}  {{'HDBACHGCAMP11' '220411' 'Ch1'}} {{'HDBACHGCAMP11' '220412' 'Ch1'}} {{'HDBACHGCAMP11' '220413' 'Ch1'}} {{'HDBACHGCAMP14' '220411' 'Ch2'}} {{'HDBACHGCAMP14' '220412' 'Ch2'}}];
+    resdir_FF_avg = fullfile(resdir,'Fig2','FF_avg');; % Results directory
+    
+    viewphotometry_avg(cellids, resdir_FF_avg, 'TriggerEvent','StimulusOn','SortEvent','TrialStart','Partitions','#TrialType','Signal','dff_A');
+    viewphotometry_avg(cellids, resdir_FF_avg, 'TriggerEvent','DeliverAllFeedback','SortEvent','TrialStart','Partitions','#Punishment','Signal','dff_A');
+    viewphotometry_avg(cellids, resdir_FF_avg, 'TriggerEvent','DeliverAllFeedback','SortEvent','TrialStart','Partitions','#AllReward','Signal','dff_A');
+    viewphotometry_avg(cellids, resdir_FF_avg, 'TriggerEvent','DeliverAllFeedback','SortEvent','TrialStart','Partitions','#Omission','Signal','dff_A');
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Average spike shape - Fig3.E
     resdir_spikeshape = fullfile(resdir,'Fig1','spike_shape_analysis');   % results directory
     issave = true;
     SpikeShape = spikeshapeanalysis_p(achcells,issave, resdir_spikeshape);
@@ -174,9 +257,8 @@ if behav_analysis
     % Save
     saveas(H, fullfile(resdir_spikeshape, ['avg_spikeshape.eps']));
     saveas(H, fullfile(resdir_spikeshape, ['avg_spikeshape.jpg']));
-end
 
-if opto_tagging
+if opto_tagging % Fig3, FigS2
     if ~tagging_stat % if statistics on light activation was not performed previously
         error_list = taggedprop(achcells, true);  % RESULTS DIRECTORY
     end
@@ -229,7 +311,7 @@ if clustering
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIGURE 2
+%FIGURE 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Preselect neurons for further analysis
@@ -277,7 +359,7 @@ if example_PSTH_plot
         mkdir(resdir_example);
     end
     example_cells = {'HDB36_190426a_3.1', 'HDB36_190504a_5.1', 'HDB36_190508a_3.2'};
-   
+    
     for e=1:length(example_cells)
         e_cell = example_cells{e};
         cellidt = e_cell;
@@ -403,10 +485,10 @@ if avg_PSTH_plot % average PSTH, boxplot for response magnitude and maxvalue
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%FIGURE 3
+%FIGURE 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if fig3spec
+if modelspec
     
     % Reinforcement learning model
     modelresdir_allcells = fullfile(resdir, 'Fig3', 'all_cholinergic_bargraph_SD'); % results directory
@@ -416,8 +498,8 @@ if fig3spec
     [a11, a21, S1, err1, c_a11, c_a21, c_S1, c_err1, model_values1] = cholinergic_RFmodel_main(achcells,...   % all neurons
         [-3 3],'baselinewin',[-3 -1],'responsewin_cue',[0 0.5],'responsewin_reinforcement',[0 0.2], 'resdir', modelresdir_allcells);
     %
-        [a12, a22, S2, err2, c_a12, c_a22, c_S2, c_err2, model_values2] = cholinergic_RFmodel_main(hdbcells,... % hdb neurons only
-            [-3 3],'baselinewin',[-3 -1],'responsewin_cue',[0 0.5],'responsewin_reinforcement',[0 0.2], 'resdir', modelresdir_hdbcells);
+    [a12, a22, S2, err2, c_a12, c_a22, c_S2, c_err2, model_values2] = cholinergic_RFmodel_main(hdbcells,... % hdb neurons only
+        [-3 3],'baselinewin',[-3 -1],'responsewin_cue',[0 0.5],'responsewin_reinforcement',[0 0.2], 'resdir', modelresdir_hdbcells);
     
     [a13, a23, S3, err3, c_a13, c_a23, c_S3, c_err3, model_values3] = cholinergic_RFmodel_main(selected_achcells,... % hdb neurons only
         [-3 3],'baselinewin',[-3 -1],'responsewin_cue',[0 0.5],'responsewin_reinforcement',[0 0.2], 'resdir', modelresdir_selected_achcells);
@@ -429,7 +511,7 @@ if fig3spec
     set(H1, 'Renderer', 'painters');
     set(H2, 'Renderer', 'painters');
     set(H3, 'Renderer', 'painters');
-
+    
     fnm = fullfile(resdir, 'Fig3', 'model_stat_all_cholinergic.fig'); % save and close figures
     fnm2 = fullfile(resdir, 'Fig3', 'model_stat_hdb.fig');
     fnm3 = fullfile(resdir, 'Fig3', 'compare_params_all_cholinergic.fig');
@@ -457,8 +539,8 @@ if fig3spec
     % Correlation of model parameters with behavioral discimination
     resdir_lrc_allcells = fullfile(resdir,'Fig3','modellickratecorr','all_cholinergic'); % results directory
     modellickratecorr(achcells,a11,a21,resdir_lrc_allcells);
-        resdir_lrc_hdbcells = fullfile(resdir,'Fig3','modellickratecorr','hdb'); % results directory
-        modellickratecorr(hdbcells,a12,a22,resdir_lrc_hdbcells);
+    resdir_lrc_hdbcells = fullfile(resdir,'Fig3','modellickratecorr','hdb'); % results directory
+    modellickratecorr(hdbcells,a12,a22,resdir_lrc_hdbcells);
     
     resdir_lrc_selected_achcells = fullfile(resdir,'Fig3','modellickratecorr','selected_achcells'); % results directory
     modellickratecorr(selected_achcells,a13,a23,resdir_lrc_selected_achcells);
@@ -476,7 +558,7 @@ if fig3spec
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%FIGURE 4
+%FIGURE 6
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if cue_rt    % Show if cue response is earlier than RT - FIG4.A-B
@@ -504,11 +586,42 @@ if rt_lick_corr % RT predicts cholinergic response and vice versa
     rtcurves_cholinergic(achcells,'align', 'tone', 'normalization', 'zscore', 'doraster', false, 'issave', true, 'resdir', resdir_rtcurves1);
     rtcurves_cholinergic(hdbcells,'align', 'tone', 'normalization', 'zscore', 'doraster', false, 'issave', true, 'resdir', resdir_rtcurves2);
     rtcurves_stats(fullfile(resdir, 'Fig4'));
+
+% Linear regression comparing reaction time and firing rate
+resdir_regr = fullfile(resdir, 'Fig4', 'linear_regression');
+cueresp_RT_regression(achcells, resdir_regr);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %EXTRA ANALYSIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Average lick PETH - FIGS1
+if figs1spec
+     resdir_lick_psth = fullfile(resdir,'FigS1','lick_psth_orig_tones');   % results directory
+    cbname_allanimals = 'Orig_tones'; % choose location of data
+    reversal_learning(cbname_allanimals, resdir_lick_psth); % average lick PSTH and statistics
+    
+     resdir_lick_psth = fullfile(resdir,'FigS1','lick_psth_rev_tones');   % results directory
+    cbname_allanimals = 'Rev_tones'; % choose location of data
+    reversal_learning(cbname_allanimals, resdir_lick_psth); % average lick PSTH and statistics
+    
+     resdir_lick_psth = fullfile(resdir,'FigS1','lick_psth_orig_tones_fulltask');   % results directory
+    cbname_allanimals = 'Orig_tones_fulltask'; % choose location of data
+    reversal_learning(cbname_allanimals, resdir_lick_psth, 0); % average lick PSTH and statistics
+    
+    resdir_lick_psth = fullfile(resdir,'FigS1','lick_psth_allanimals_rev_tones_fulltask');   % results directory
+    cbname_allanimals = 'Rev_tones_fulltask'; % choose location of data
+    reversal_learning(cbname_allanimals, resdir_lick_psth); % average lick PSTH and statistics
+end
+
+% Average lick PETH - FIGS3.A-B
+if figs3spec
+resdir_lick_psth = fullfile(resdir,'FigS3','lick_psth');   % results directory
+Ach_lick_psth_summary_allcond(achcells,resdir_lick_psth,true)  % average lick PSTH
+Ach_lick_psth_summary(achcells,resdir_lick_psth,true)  % average lick PSTH
+Ach_lick_poppsth(achcells,resdir_lick_psth,true) % color-coded lick raster
+end
 
 % Cholinergic PSTHs sorted by location
 if psth_by_area

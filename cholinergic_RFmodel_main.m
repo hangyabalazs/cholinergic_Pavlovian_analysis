@@ -120,9 +120,10 @@ for i = 1:NumCells   % loop through cells
         eps(k) = nanstd(spike_count);   % SD of firing rate (for the noise model in MLE fitting)
         spike_data{k} = spike_count;   % firing rates
         baseline_data{k} = baseline;   % baseline firing rates
-        maxvalue(k) = stats.maxvalue;
+        maxvalue{k} = stats.maxvalue;
     end
     maxval_all{i} = maxvalue;
+    
     % Fit TDRL model
     [a1(i), a2(i), S(i), PARAM, fr, err(i)] = best_fit_cholinergic(cellid,spike_data,eps);
     

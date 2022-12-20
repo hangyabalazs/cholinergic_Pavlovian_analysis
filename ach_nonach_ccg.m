@@ -35,8 +35,7 @@ filterinput = {'light_activation_duration',[-5 5],'margins',[0 0]};
 
 aID = unique(getvalue('RatID_tag', achcells)); % animal IDs
 
-
-for i=1:length(aID)
+for i = 1:length(aID)
     aID_achcell = findachcell(aID{i});    % find cholinergic cell of given animal ID
     sID = getvalue('SessionID_tag', aID_achcell); % find sessionID of the cell
     for n = 1:length(sID)
@@ -56,7 +55,8 @@ for i=1:length(aID)
 end
 end
 
-function aID_achcell=findachcell(aID)
+% -------------------------------------------------------------------------
+function aID_achcell = findachcell(aID)
 % Load CellBase
 load(getpref('cellbase','fname')); %tried to do it with 'selectcell' bbut could not succeed
 ischat = getvalue('ChAT+');

@@ -235,26 +235,34 @@ for p = 1:NumParts % if there are more than one partitions
     psth_R2(any(isnan(psth_R2), 2), :) = [];
     
     % Color coded lick raster
-    % PSTH_all = [{psth_R1} {psth_R2}];
-    % for j = 1:length(PSTH_all)
-    %     if j==1  % sort based on T1 response latency
-    %     [m1, m2] = max(PSTH_all{j},[],2);
-    %     [srt, Ia] = sort(m1,'descend');
-    %     end
-    %     subplot(1,2,j);
-    %     imagesc(time,1:size(PSTH_all{j},1),PSTH_all{j}(Ia,:)) % plot
-    %     set(gca,'XLim',[-3000 3000]);
-    %     colormap(hot)
-    %     colorbar
-    %     caxis([0 20]);
-    % end
+    PSTH_all = [{psth_R1} {psth_R2}];
+    for j = 1:length(PSTH_all)
+        if j==1  % sort based on T1 response magnitude
+        [m1, m2] = max(PSTH_all{j}(:,4001:4500),[],2);
+        [srt, Ia] = sort(m1,'descend');
+        end
+        subplot(1,2,j);
+        imagesc(time,1:size(PSTH_all{j},1),PSTH_all{j}(Ia,:)) % plot
+        set(gca,'XLim',[-3000 3000]);
+        colormap(hot)
+        colorbar
+        caxis([0 20]);
+    end
+    fnm = fullfile(resdir, ['heatmap_' responsetype '.jpg']);
+    saveas(gcf, fnm)
+    set(gcf, 'renderer', 'painters')
+    fnm = fullfile(resdir, ['heatmap_' responsetype '.eps']);
+    saveas(gcf, fnm)
+    fnm = fullfile(resdir, ['heatmap_' responsetype '.fig']);
+    saveas(gcf, fnm)
+    close(gcf)
     
     % Plot
     inx = 1:size((psth_R1),1);  % all
     inx2 = 1:size((psth_R2),1);  % all
     disp(length(inx))
     
-    figure(H) % plot average PSTHs
+    H=figure; % plot average PSTHs
     if NumParts > 1 && isvarname('filters')
         title(filters{1})
     end
@@ -296,8 +304,8 @@ avg_spikecount2(:,any(isnan(avg_spikecount2(p,:)), 1)) = [];
 if size(R1{1,1},1) <= 1 % when trials are not partitioned
     
     % Box-whisker plot
-    [H, Wp1] = boxstat(avg_spikecount1,avg_spikecount2,filters{1},filters{2},0.05,'paired');
-    [G, Wp2] = boxstat(maxvalue1,maxvalue2,filters{1},filters{2},0.05,'paired');
+    [H, Wp1] = boxstat2(avg_spikecount1,avg_spikecount2,filters{1},filters{2},0.05,'paired');
+    [G, Wp2] = boxstat2(maxvalue1,maxvalue2,filters{1},filters{2},0.05,'paired');
     figure;
     boxplot(maxvalue1-maxvalue2);
     hold on;
@@ -306,6 +314,28 @@ if size(R1{1,1},1) <= 1 % when trials are not partitioned
     x = ones(length(y),1);
     scatter(x(:),y(:),'filled','MarkerFaceAlpha',0.6','jitter','on','jitterAmount',0.05);
     I = gcf;
+    
+    figure;
+    bar(1, median(avg_spikecount1-avg_spikecount2))
+    hold on
+    errorbar(1, median(avg_spikecount1-avg_spikecount2),se_of_median(avg_spikecount1-avg_spikecount2), se_of_median(avg_spikecount1-avg_spikecount2))
+    fnm_bar_avg = fullfile(resdir,[responsetype  'avgFR_bargraph.fig']);
+    saveas(gcf,fnm_bar_avg);
+    set(gcf, 'renderer', 'painters')
+    fnm_bar_avg = fullfile(resdir,[responsetype  'avgFR_bargraph.eps']);
+    saveas(gcf,fnm_bar_avg);
+    close(gcf)
+    
+    figure;
+    bar(1, nanmedian(maxvalue1-maxvalue2))
+    hold on
+    errorbar(1, nanmedian(maxvalue1-maxvalue2),se_of_median(maxvalue1-maxvalue2), se_of_median(maxvalue1-maxvalue2))
+    fnm_bar_max = fullfile(resdir,[responsetype  'maxFR_bargraph.fig']);
+    saveas(gcf,fnm_bar_max);
+    set(gcf, 'renderer', 'painters')
+    fnm_bar_max = fullfile(resdir,[responsetype  'maxFR_bargraph.eps']);
+    saveas(gcf,fnm_bar_max);
+    close(gcf)
     
     % Save figure
     filename = fullfile(resdir,['compare_expectation_' responsetype  '_boxstat.fig']);
@@ -321,7 +351,7 @@ if size(R1{1,1},1) <= 1 % when trials are not partitioned
     filename = fullfile(resdir,['compare_FR_maxvalue_' responsetype  '.mat']);
     save(filename,'avg_spikecount1','avg_spikecount2','maxvalue1','maxvalue2');
     
-    %     close all
+    close all
     
 else
     

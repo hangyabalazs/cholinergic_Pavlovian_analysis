@@ -43,18 +43,24 @@ NumSessions = length(Sessions);
 
 % Time window
 wn = [-3 3];   % in seconds
+twin = [0 1];
 dt = 0.001;   % resolution, in seconds
 time = wn(1):dt:wn(2);   % time vector
+tinx = [find(time==twin(1)) find(time==twin(2))];
 
 % PETH
-[Hit_allpsth, FA_allpsth] = deal([]);
+[Hit_allpsth, FA_allpsth, Hit_allspt, FA_allspt] = deal([]);
 for iS = 1:NumSessions
-cSession = Sessions{iS}; % extract sessionIDs in the form of 1x2 cell
+    cSession = Sessions{iS}; % extract sessionIDs in the form of 1x2 cell
     [rat,remain] = strtok(cSession,'_');
     [session, ~] = strtok(remain, '_');
-    sessionid = [{rat}, {session}];    [spsth_hit, spsth_fa] = main(sessionid,wn,dt);
+    sessionid = [{rat}, {session}];
+    [spsth_hit, spt_hit, spsth_fa spt_fa] = main(sessionid,wn,dt);
     Hit_allpsth = [Hit_allpsth; spsth_hit];
-    FA_allpsth = [FA_allpsth; spsth_fa]; 
+    FA_allpsth = [FA_allpsth; spsth_fa];
+    Hit_allspt = [Hit_allspt; mean(sum(spt_hit(:,tinx(1):tinx(2)),2))];
+    FA_allspt = [FA_allspt; mean(sum(spt_fa(:,tinx(1):tinx(2)),2))];
+    
     H = gcf;
     if issave
         cellidt = [sessionid{1} '_' sessionid{2}];
@@ -65,6 +71,13 @@ cSession = Sessions{iS}; % extract sessionIDs in the form of 1x2 cell
     end
     close(H)
 end
+
+boxstat2(Hit_allspt, FA_allspt, 'T1', 'T2', 0.05, 'paired')
+bar([1 2], [median(Hit_allspt) median(FA_allspt)])
+sem1 = se_of_median(Hit_allspt);
+sem2=se_of_median(FA_allspt);
+hold on
+errorbar([1 2], [median(Hit_allspt) median(FA_allspt)], [sem1 sem2], [sem1 sem2])
 
 % Plot & save
 H = figure;
@@ -84,18 +97,18 @@ if issave
 end
 
 % -------------------------------------------------------------------------
-function [spsth_hit, spsth_fa] = main(cellid,wn,dt)
+function [spsth_hit, spt_hit, spsth_fa, spt_fa] = main(cellid,wn,dt)
 
 % Filter input
 filterinput_hit = 'TrialType==1';
 filterinput_fa = 'TrialType==2';
 
 % Calcualte lick PSTH
-[~, spsth_hit] = ...
+[~, spsth_hit, ~, ~, spt_hit] = ...
     ultimate_psth(cellid,'lick','StimulusOn',wn,...
     'dt',dt,'sigma',0.05,'event_filter','custom','filterinput',filterinput_hit,...
     'isadaptive',0,'maxtrialno',Inf);
-[~, spsth_fa] = ...
+[~, spsth_fa, ~, ~, spt_fa] = ...
     ultimate_psth(cellid,'lick','StimulusOn',wn,...
     'dt',dt,'sigma',0.05,'event_filter','custom','filterinput',filterinput_fa,...
     'isadaptive',0,'maxtrialno',Inf);

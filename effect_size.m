@@ -17,7 +17,6 @@ function effect_size(achcells, responsetype, ispart, resdir, data_type)
 %   hangya.balazs@koki.mta.hu
 %   01-May-2020
 
-
 % Input arguments
 if nargin < 1 || isempty(achcells)
     achcells = select_ach_cells(achcells);

@@ -18,7 +18,7 @@ function [eta1, eta2, scalingfactor, err] = Ach_model(trialparam, fr)
 initparam = [0.5 0.5 30];
 
 % Call 'fminsearchbnd' for optimization
-modelfun = @Ach_RL_modelfun;   % goodness-of-fit function
+modelfun = @Ach_RL_modelfun;   % goodness-of-fit function; use Ach_RL_modelfun_or for including omission responses
 [param, err] = fminsearchbnd(@(p)FitAchModel(p,fr,modelfun,trialparam),initparam,...
     [0, 0, -Inf],[1, 1, Inf],optimset('MaxFunEvals',500));
 
